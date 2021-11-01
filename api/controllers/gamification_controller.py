@@ -18,8 +18,3 @@ class GamificationController:
         trophy = Trophy(description=trophy.description,points=trophy.points)
         result = TrophyRepository.add_trophy(trophy)
         return {"trophy": result.convert_to_json_with_id()}
-
-
-    @staticmethod
-    def find_by(value):
-        raise HTTPException(status_code=404, detail="Not implemented")
