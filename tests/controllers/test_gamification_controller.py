@@ -1,7 +1,10 @@
 import pytest
 from api.controllers.constants import *
 from api.controllers.gamification_controller import GamificationController
+from api.models.requests.fastforwards import Fastforwards
 from api.models.requests.lives import Lives
+from api.models.requests.minutes import Minutes
+from api.models.requests.points import Points
 from api.models.requests.trophies import Trophy
 from fastapi import HTTPException
 
@@ -49,7 +52,6 @@ def test_create_user_status(init):
     assert response["user_status"]["fast_forward_exam"] == FAST_FORWARD_EXAM
     assert response["user_status"]["points"] == POINTS
     assert response["user_status"]["last_life_actualization"] != None
-    assert response["user_status"]["actual_time"] != None
 
 def test_get_user_status(init):
     user = User(email = "email@email.com")
@@ -63,7 +65,6 @@ def test_get_user_status(init):
     assert response["user_status"]["fast_forward_exam"] == FAST_FORWARD_EXAM
     assert response["user_status"]["points"] == POINTS
     assert response["user_status"]["last_life_actualization"] != None
-    assert response["user_status"]["actual_time"] != None
 
 
 def test_get_user_lives_by_email(init):
@@ -82,3 +83,42 @@ def test_update_user_lives_by_email(init):
     assert response["lives"] == LIVES + lives.lives
     assert response["last_life_actualization"] != None
     assert response["actual_time"] != None
+
+def test_get_user_points_by_email(init):
+    user = User(email = "email@email.com")
+    GamificationController.create_user_status(user)
+    response = GamificationController.get_user_points_by_email(user.email)
+    assert response == { "points": POINTS }
+
+def test_update_user_points_by_email(init):
+    user = User(email = "email@email.com")
+    points = Points(points=1)
+    GamificationController.create_user_status(user)
+    response = GamificationController.update_user_points(user.email,points)
+    assert response == { "points": POINTS + points.points}
+
+def test_get_user_minutes_by_email(init):
+    user = User(email = "email@email.com")
+    GamificationController.create_user_status(user)
+    response = GamificationController.get_user_minutes_by_email(user.email)
+    assert response == { "extra_minutes": EXTRA_MINUTES }
+
+def test_update_user_minutes_by_email(init):
+    user = User(email = "email@email.com")
+    minutes = Minutes(extra_minutes=1)
+    GamificationController.create_user_status(user)
+    response = GamificationController.update_user_minutes(user.email,minutes)
+    assert response == { "extra_minutes": EXTRA_MINUTES + minutes.extra_minutes}
+
+def test_get_user_fastforwards_by_email(init):
+    user = User(email = "email@email.com")
+    GamificationController.create_user_status(user)
+    response = GamificationController.get_user_fastforwards_by_email(user.email)
+    assert response == { "fastforwards": FAST_FORWARD_EXAM }
+
+def test_update_user_fastforwards_by_email(init):
+    user = User(email = "email@email.com")
+    fastforwards = Fastforwards(fastforwards=1)
+    GamificationController.create_user_status(user)
+    response = GamificationController.update_user_fastforwards(user.email,fastforwards)
+    assert response == { "fastforwards": FAST_FORWARD_EXAM + fastforwards.fastforwards}

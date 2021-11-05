@@ -2,4 +2,4 @@ from pydantic.main import BaseModel
 
 
 class Lives(BaseModel):
-    lives: int
+    lives: int #un numero positivo sumara vidas, mientras que un numero negativo las restara
