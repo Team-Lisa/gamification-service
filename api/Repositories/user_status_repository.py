@@ -1,7 +1,4 @@
 from datetime import datetime
-
-from api.models.trophy import Trophy
-from api.Repositories.db import DataBase
 from api.models.user_status import UserStatus
 
 
@@ -38,3 +35,15 @@ class UserStatusRepository():
     def update_user_fastforwards(email, new_amount):
         UserStatus.objects(email=email).update(fast_forward_exam=new_amount)
         return UserStatusRepository.get_user_status_by_email(email)
+
+    @staticmethod
+    def update_history(email,history):
+        UserStatus.objects(email=email).update(history=history)
+        return {"message": "history updated"}
+
+    @staticmethod
+    def update_trophies(email, trophies):
+        UserStatus.objects(email=email).update(trophies=trophies)
+        return {"message": "trophies updated"}
+
+

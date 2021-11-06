@@ -6,7 +6,6 @@ class UserStatus(Document):
     email = mongoengine.StringField()
     lives = mongoengine.IntField()
     last_life_actualization = mongoengine.StringField() # utlima vez que se actualizo la vida
-    #actual_time = mongoengine.StringField() # enviar hora actual del servidor
     trophies = mongoengine.ListField()
     history = mongoengine.DictField()
     extra_minutes = mongoengine.IntField()

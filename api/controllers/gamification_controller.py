@@ -47,7 +47,8 @@ class GamificationController:
     @staticmethod
     def update_user_lives(email, lives):
         actual_lives = GamificationController.get_user_lives_by_email(email)
-        new_lives = actual_lives["lives"] + lives.lives
+        total = actual_lives["lives"] + lives.lives
+        new_lives = total if total >= 0 else 0
         result = UserStatusRepository.update_user_lives(email, new_lives)
         actual_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
         return {
@@ -66,7 +67,8 @@ class GamificationController:
     @staticmethod
     def update_user_points(email, points):
         actual_points = GamificationController.get_user_status_by_email(email)
-        new_points = actual_points["user_status"]["points"]+ points.points
+        total = actual_points["user_status"]["points"]+ points.points
+        new_points = total if total >= 0 else 0
         result = UserStatusRepository.update_user_points(email, new_points)
         return {
             "points": result[0]["points"]
@@ -82,7 +84,8 @@ class GamificationController:
     @staticmethod
     def update_user_minutes(email, minutes):
         actual_minutes = GamificationController.get_user_status_by_email(email)
-        new_minutes = actual_minutes["user_status"]["extra_minutes"] + minutes.extra_minutes
+        total = actual_minutes["user_status"]["extra_minutes"] + minutes.extra_minutes
+        new_minutes = total if total >= 0 else 0
         result = UserStatusRepository.update_user_minutes(email, new_minutes)
         return {
             "extra_minutes": result[0]["extra_minutes"]
@@ -98,7 +101,8 @@ class GamificationController:
     @staticmethod
     def update_user_fastforwards(email, amount):
         actual_amount = GamificationController.get_user_status_by_email(email)
-        new_amount = actual_amount["user_status"]["fast_forward_exam"] + amount.fastforwards
+        total = actual_amount["user_status"]["fast_forward_exam"] + amount.fastforwards
+        new_amount = total if total >= 0 else 0
         result = UserStatusRepository.update_user_fastforwards(email, new_amount)
         return {
             "fastforwards": result[0]["fast_forward_exam"]
@@ -109,4 +113,44 @@ class GamificationController:
         result = StoreItemsRepository.get_all_items()
         result = map(lambda item: item.convert_to_json_with_id(), list(result))
         return {"items": list(result)}
+
+    @staticmethod
+    def get_units_of_a_challenge(challenge_id, email):
+        user_status =  GamificationController.get_user_status_by_email(email)
+        return {"units":
+                    user_status["user_status"]["history"][challenge_id][UNITS]
+                }
+
+    @staticmethod
+    def get_certain_unit_of_a_certain_challenge(challenge_id, unit_id, email):
+        user_status = GamificationController.get_user_status_by_email(email)
+        return {"unit":
+                    user_status["user_status"]["history"][challenge_id][UNITS][unit_id]
+                }
+
+    @staticmethod
+    def update_unit_info(unit, challenge_id, unit_id, email):
+        history = GamificationController.get_user_status_by_email(email)["user_status"]["history"]
+        unit_data = history[challenge_id][UNITS][unit_id]
+        if unit.lesonIdCompleted:
+            unit_data[LESSONSCOMPLETED].append(unit.lesonIdCompleted)
+        if unit.examCompleted:
+            unit_data[EXAMCOMPLETED] = unit.examCompleted
+        if unit.unitCompleted:
+            unit_data[UNITCOMPLETED] = unit.unitCompleted
+        history[challenge_id][UNITS][unit_id] = unit_data
+        return UserStatusRepository.update_history(email, history)
+
+    @staticmethod
+    def update_challenge_completed(challenge_id, email):
+        history = GamificationController.get_user_status_by_email(email)["user_status"]["history"]
+        history[challenge_id][CHALLENGECOMPLETED] = True
+        return UserStatusRepository.update_history(email, history)
+
+    @staticmethod
+    def update_throphy_completed(trophy_id, email):
+        trophies = GamificationController.get_user_status_by_email(email)["user_status"]["trophies"]
+        trophies.append(trophy_id)
+        return UserStatusRepository.update_trophies(email, trophies)
+
 
