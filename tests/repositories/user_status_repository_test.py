@@ -49,7 +49,7 @@ def test_update_user_lives(init):
                              fast_forward_exam=FAST_FORWARD_EXAM, points=POINTS)
     UserStatusRepository.add_user_status(user_status)
     response = UserStatusRepository.update_user_lives(email, new_lives)
-    assert response[0]["lives"] == LIVES + new_lives
+    assert response[0]["lives"] == new_lives
     assert response[0]["email"] == email
     assert response[0]["trophies"] == TROPHIES
     assert response[0]["history"] == HISTORY

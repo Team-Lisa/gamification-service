@@ -131,6 +131,16 @@ class GamificationController:
     @staticmethod
     def update_unit_info(unit, challenge_id, unit_id, email):
         history = GamificationController.get_user_status_by_email(email)["user_status"]["history"]
+        if not challenge_id in history:
+            history[challenge_id] = {UNITS:{unit_id:
+                                                {EXAMCOMPLETED:False,
+                                                 LESSONSCOMPLETED:[],
+                                                 UNITCOMPLETED:False}},
+                                     CHALLENGECOMPLETED:False}
+        elif challenge_id in history and not unit_id in history[challenge_id][UNITS]:
+            history[challenge_id][UNITS][unit_id] = {EXAMCOMPLETED:False,
+                                                 LESSONSCOMPLETED:[],
+                                                 UNITCOMPLETED:False}
         unit_data = history[challenge_id][UNITS][unit_id]
         if unit.lesonIdCompleted:
             unit_data[LESSONSCOMPLETED].append(unit.lesonIdCompleted)

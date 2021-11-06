@@ -123,28 +123,19 @@ def test_update_user_fastforwards_by_email(init):
     response = GamificationController.update_user_fastforwards(user.email,fastforwards)
     assert response == { "fastforwards": FAST_FORWARD_EXAM + fastforwards.fastforwards}
 
-def test_get_units_of_a_challenge(init):
-    user = User(email = "email@email.com")
-    GamificationController.create_user_status(user)
-    response = GamificationController.get_units_of_a_challenge(CHALLENGEID1,user.email)
-    assert response == {
-        UNITS: {
-            UNIT1: {
-                EXAMCOMPLETED: False,
-                LESSONSCOMPLETED: [],
-                UNITCOMPLETED: False
-            }
-        }
-    }
 
 def test_get_certain_unit_of_a_certain_challenge(init):
     user = User(email="email@email.com")
     GamificationController.create_user_status(user)
-    response = GamificationController.get_certain_unit_of_a_certain_challenge(CHALLENGEID1,UNIT1, user.email)
+    unit = Unit(lesonIdCompleted = 1)
+    challengeid = "c1"
+    unitid = "u1"
+    GamificationController.update_unit_info(unit,challengeid,unitid, user.email)
+    response = GamificationController.get_certain_unit_of_a_certain_challenge(challengeid,unitid, user.email)
     assert response == {
         "unit": {
             EXAMCOMPLETED: False,
-            LESSONSCOMPLETED: [],
+            LESSONSCOMPLETED: ["1"],
             UNITCOMPLETED: False
             }
     }
@@ -191,9 +182,13 @@ def test_update_challnge_completed(init):
     email = "email@email.com"
     user = User(email=email)
     GamificationController.create_user_status(user)
-    GamificationController.update_challenge_completed(CHALLENGEID1,email)
+    unit = Unit(lesonIdCompleted=1)
+    challengeid = "c1"
+    unitid = "u1"
+    GamificationController.update_unit_info(unit, challengeid, unitid, user.email)
+    GamificationController.update_challenge_completed(challengeid,email)
     updated_user = GamificationController.get_user_status_by_email(email)
-    assert updated_user["user_status"]["history"][CHALLENGEID1][CHALLENGECOMPLETED] == True
+    assert updated_user["user_status"]["history"][challengeid][CHALLENGECOMPLETED] == True
 
 def test_update_throphie_completed(init):
     email = "email@email.com"
