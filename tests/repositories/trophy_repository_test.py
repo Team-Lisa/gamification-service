@@ -2,7 +2,7 @@ from api.Repositories.trophy_repository import TrophyRepository
 from api.models.trophy import Trophy
 
 
-def test_add_user_successfully(init):
+def test_add_trophy_successfully(init):
     description = "soy un trofeo"
     points = 200
     result = TrophyRepository.add_trophy(Trophy( description=description, points=points))
