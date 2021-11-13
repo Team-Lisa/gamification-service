@@ -65,6 +65,7 @@ def test_get_user_status(init):
     assert response["user_status"]["fast_forward_exam"] == FAST_FORWARD_EXAM
     assert response["user_status"]["points"] == POINTS
     assert response["user_status"]["last_life_actualization"] != None
+    assert response["actual_time"] != None
 
 
 def test_get_user_lives_by_email(init):

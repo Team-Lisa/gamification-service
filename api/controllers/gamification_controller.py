@@ -17,7 +17,7 @@ class GamificationController:
 
     @staticmethod
     def create(trophy):
-        trophy = Trophy(description=trophy.description,points=trophy.points)
+        trophy = Trophy(description=trophy.description, points=trophy.points)
         result = TrophyRepository.add_trophy(trophy)
         return {"trophy": result.convert_to_json_with_id()}
 
@@ -28,11 +28,14 @@ class GamificationController:
         result = UserStatusRepository.add_user_status(user_status)
         return {"user_status": result.convert_to_json()}
 
-
     @staticmethod
     def get_user_status_by_email(email):
         result = UserStatusRepository.get_user_status_by_email(email)
-        return {"user_status": result[0].convert_to_json()}
+        actual_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        return {
+            "user_status": result[0].convert_to_json(),
+            "actual_time": actual_time
+        }
 
     @staticmethod
     def get_user_lives_by_email(email):
@@ -67,7 +70,7 @@ class GamificationController:
     @staticmethod
     def update_user_points(email, points):
         actual_points = GamificationController.get_user_status_by_email(email)
-        total = actual_points["user_status"]["points"]+ points.points
+        total = actual_points["user_status"]["points"] + points.points
         new_points = total if total >= 0 else 0
         result = UserStatusRepository.update_user_points(email, new_points)
         return {
@@ -116,7 +119,7 @@ class GamificationController:
 
     @staticmethod
     def get_units_of_a_challenge(challenge_id, email):
-        user_status =  GamificationController.get_user_status_by_email(email)
+        user_status = GamificationController.get_user_status_by_email(email)
         return {"units":
                     user_status["user_status"]["history"][challenge_id][UNITS]
                 }
@@ -132,15 +135,15 @@ class GamificationController:
     def update_unit_info(unit, challenge_id, unit_id, email):
         history = GamificationController.get_user_status_by_email(email)["user_status"]["history"]
         if not challenge_id in history:
-            history[challenge_id] = {UNITS:{unit_id:
-                                                {EXAMCOMPLETED:False,
-                                                 LESSONSCOMPLETED:[],
-                                                 UNITCOMPLETED:False}},
-                                     CHALLENGECOMPLETED:False}
+            history[challenge_id] = {UNITS: {unit_id:
+                                                 {EXAMCOMPLETED: False,
+                                                  LESSONSCOMPLETED: [],
+                                                  UNITCOMPLETED: False}},
+                                     CHALLENGECOMPLETED: False}
         elif challenge_id in history and not unit_id in history[challenge_id][UNITS]:
-            history[challenge_id][UNITS][unit_id] = {EXAMCOMPLETED:False,
-                                                 LESSONSCOMPLETED:[],
-                                                 UNITCOMPLETED:False}
+            history[challenge_id][UNITS][unit_id] = {EXAMCOMPLETED: False,
+                                                     LESSONSCOMPLETED: [],
+                                                     UNITCOMPLETED: False}
         unit_data = history[challenge_id][UNITS][unit_id]
         if unit.lesonIdCompleted:
             unit_data[LESSONSCOMPLETED].append(unit.lesonIdCompleted)
@@ -162,5 +165,3 @@ class GamificationController:
         trophies = GamificationController.get_user_status_by_email(email)["user_status"]["trophies"]
         trophies.append(trophy_id)
         return UserStatusRepository.update_trophies(email, trophies)
-
-
