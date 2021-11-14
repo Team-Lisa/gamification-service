@@ -24,7 +24,9 @@ class GamificationController:
     @staticmethod
     def create_user_status(user):
         time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-        user_status = UserStatus(email = user.email,lives= LIVES, last_life_actualization = time, trophies = TROPHIES, history = HISTORY, extra_minutes = EXTRA_MINUTES, fast_forward_exam = FAST_FORWARD_EXAM, points = POINTS )
+        user_status = UserStatus(email=user.email, lives=LIVES, last_life_actualization=time, trophies=TROPHIES,
+                                 history=HISTORY, extra_minutes=EXTRA_MINUTES, fast_forward_exam=FAST_FORWARD_EXAM,
+                                 points=POINTS)
         result = UserStatusRepository.add_user_status(user_status)
         return {"user_status": result.convert_to_json()}
 
