@@ -17,8 +17,13 @@ class UserStatusRepository():
         return UserStatus.objects(email=email)
 
     @staticmethod
-    def update_user_lives(email ,new_lives):
+    def update_user_lives_and_last_life_actualization(email ,new_lives):
         UserStatus.objects(email=email).update(lives=new_lives,last_life_actualization = datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
+        return UserStatusRepository.get_user_status_by_email(email)
+
+    @staticmethod
+    def update_user_lives(email ,new_lives):
+        UserStatus.objects(email=email).update(lives=new_lives)
         return UserStatusRepository.get_user_status_by_email(email)
 
     @staticmethod
