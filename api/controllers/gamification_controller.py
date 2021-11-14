@@ -34,9 +34,9 @@ class GamificationController:
     def get_user_status_by_email(email):
         result = UserStatusRepository.get_user_status_by_email(email)
         actual_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-        result[0]["actual_time"] = actual_time
         return {
-            "user_status": result[0].convert_to_json()
+            "user_status": result[0].convert_to_json(),
+            "actual_time": actual_time
         }
 
     @staticmethod
