@@ -54,7 +54,7 @@ class GamificationController:
         actual_lives = GamificationController.get_user_lives_by_email(email)
         total = actual_lives["lives"] + lives.lives
         new_lives = total if total >= 0 else 0
-        if actual_lives["lives"] == 5:
+        if actual_lives["lives"] == 5 or lives.lives > 0:
             result = UserStatusRepository.update_user_lives_and_last_life_actualization(email, new_lives)
         else:
             result = UserStatusRepository.update_user_lives(email, new_lives)
