@@ -78,7 +78,7 @@ def test_get_user_lives_by_email(init):
 
 def test_update_user_lives_by_email(init):
     user = User(email = "email@email.com")
-    lives = Lives(lives=1)
+    lives = Lives(lives=-1)
     GamificationController.create_user_status(user)
     response = GamificationController.update_user_lives(user.email,lives)
     assert response["lives"] == LIVES + lives.lives
