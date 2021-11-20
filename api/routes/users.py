@@ -6,6 +6,7 @@ from api.models.responses.units import Units as UnitsResponse
 from api.models.responses.unit import Unit as UnitResponse
 from api.models.responses.user import UserStatus as UserStatusResponse
 from api.models.requests.user  import User
+from api.models.responses.wonTrophies import WonTrophies
 
 router = APIRouter(tags=["Users"])
 
@@ -27,11 +28,11 @@ async def get_user_history_units_of_a_challenge(challenge_id: str,email: str = "
 async def get_user_history_certain_unit_of_a_challenge(challenge_id: str,unit_id:str,email: str = ""):
     return GamificationController.get_certain_unit_of_a_certain_challenge(challenge_id,unit_id,email)
 
-@router.patch("/users/history/challenges/{challenge_id}/units/{unit_id}", status_code=201, response_model=Message) #actualizo cierta unidad del challenge
+@router.patch("/users/history/challenges/{challenge_id}/units/{unit_id}", status_code=201, response_model=WonTrophies) #actualizo cierta unidad del challenge
 async def update_unit_info(unit:Unit,challenge_id: str,unit_id:str,email: str = ""):
     return GamificationController.update_unit_info(unit,challenge_id,unit_id,email)
 
-@router.patch("/users/history/challenges/{challenge_id}", status_code=201, response_model=Message) #actualizo a challenge completado
+@router.patch("/users/history/challenges/{challenge_id}", status_code=201, response_model=WonTrophies) #actualizo a challenge completado
 async def update_challenge_completed(challenge_id: str,email: str = ""):
     return GamificationController.update_challenge_completed(challenge_id,email)
 

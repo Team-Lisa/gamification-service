@@ -5,6 +5,7 @@ from mongoengine import Document
 class Trophy(Document):
     description = mongoengine.StringField()
     points = mongoengine.IntField()
+    rules = mongoengine.DictField()
 
     def convert_to_json(self):
         result = self.to_mongo().to_dict()

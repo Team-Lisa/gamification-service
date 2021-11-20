@@ -17,3 +17,14 @@ HISTORY = {}
 EXTRA_MINUTES = 0
 FAST_FORWARD_EXAM = 0
 POINTS = 0
+COUNTLESSONS = "count_lessons"
+COUNTUNITS = "count_units"
+COUNTCHALLENGES = "count_challenges"
+COUNTBUYEDITEMS = "count_buyed_items"
+RULES = {
+    COUNTLESSONS:0,
+    COUNTUNITS:0,
+    COUNTCHALLENGES: 0,
+    COUNTBUYEDITEMS: 0
+}
+
