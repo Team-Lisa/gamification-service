@@ -122,12 +122,19 @@ class GamificationController:
 
     @staticmethod
     def update_user_fastforwards(email, amount):
-        actual_amount = GamificationController.get_user_status_by_email(email)
-        total = actual_amount["user_status"]["fast_forward_exam"] + amount.fastforwards
+        user_status = GamificationController.get_user_status_by_email(email)
+        total = user_status["user_status"]["fast_forward_exam"] + amount.fastforwards
         new_amount = total if total >= 0 else 0
-        result = UserStatusRepository.update_user_fastforwards(email, new_amount)
+        UserStatusRepository.update_user_fastforwards(email, new_amount)
+        if amount.fastforwards > 0:
+            UserStatusRepository.updateRule(COUNTBUYEDITEMS, email)
+            won_trophies = GamificationController.check_if_trophy_has_been_earned(email)
+            user_status["user_status"]["trophies"] += won_trophies
+            UserStatusRepository.update_trophies(email, user_status["user_status"]["trophies"])
+        else:
+            won_trophies = []
         return {
-            "fastforwards": result[0]["fast_forward_exam"]
+            "won_trophies": won_trophies
         }
 
     @staticmethod
@@ -173,6 +180,13 @@ class GamificationController:
         if unit.unitCompleted:
             unit_data[UNITCOMPLETED] = unit.unitCompleted
             UserStatusRepository.updateRule(COUNTUNITS,email)
+        if unit.allExercisesExam:
+            UserStatusRepository.updateRule(ALLEXERCISESEXAM, email)
+        if unit.allExercisesLesson:
+            UserStatusRepository.updateRule(ALLEXERCISESLESSON, email)
+        if unit.time:
+            if unit.time < MAX_TIME:
+                UserStatusRepository.updateRule(TIME, email)
         history[challenge_id][UNITS][unit_id] = unit_data
         won_trophies = GamificationController.check_if_trophy_has_been_earned(email)
         user_status["trophies"] += won_trophies
