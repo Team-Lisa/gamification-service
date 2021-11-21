@@ -1,7 +1,8 @@
 # Gamification Service
 
 [![.github/workflows/pipeline.yml](https://github.com/Team-Lisa/gamification-service/actions/workflows/pipeline.yml/badge.svg?branch=main)](hhttps://github.com/Team-Lisa/gamification-service/actions/workflows/pipeline.yml)
-[![Coverage Status](https://coveralls.io/repos/github/Team-Lisa/gamification-service/badge.svg?branch=main)](https://coveralls.io/github/Team-Lisa/gamification-service/)
+[![Coverage Status](https://coveralls.io/repos/github/Team-Lisa/gamification-service/badge.svg)](https://coveralls.io/github/Team-Lisa/gamification-service)
+
 ## Local Mode
 
 #### Requirements
