@@ -3,6 +3,7 @@ from api.Repositories.trophy_repository import TrophyRepository
 from api.controllers.constants import *
 from datetime import datetime
 from api.Repositories.user_status_repository import UserStatusRepository
+from api.models.requests.points import Points
 from api.models.user_status import UserStatus
 from api.models.trophy import Trophy
 
@@ -17,7 +18,7 @@ class GamificationController:
 
     @staticmethod
     def create(trophy):
-        trophy = Trophy(description=trophy.description, points=trophy.points)
+        trophy = Trophy(description=trophy.description, points=trophy.points, rules = trophy.rules)
         result = TrophyRepository.add_trophy(trophy)
         return {"trophy": result.convert_to_json_with_id()}
 
@@ -63,13 +64,22 @@ class GamificationController:
             new_lives = total
         if actual_lives["lives"] == 5 or lives.lives > 0:
             result = UserStatusRepository.update_user_lives_and_last_life_actualization(email, new_lives)
+            if lives.market:
+                UserStatusRepository.updateRule(COUNTBUYEDITEMS, email)
+                won_trophies = GamificationController.check_if_trophy_has_been_earned(email)
+                user_status = GamificationController.get_user_status_by_email(email)
+                user_status["user_status"]["trophies"] += won_trophies
+                UserStatusRepository.update_trophies(email, user_status["user_status"]["trophies"])
+            else:
+                won_trophies = []
         else:
             result = UserStatusRepository.update_user_lives(email, new_lives)
         actual_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
         return {
             "lives": result[0]["lives"],
             "last_life_actualization": result[0]["last_life_actualization"],
-            "actual_time": actual_time
+            "actual_time": actual_time,
+            "won_trophies": won_trophies
         }
 
     @staticmethod
@@ -222,7 +232,14 @@ class GamificationController:
             value = list(t["rules"].values())[0]
             if user_status["rules"][key] == value and t["id"] not in user_status["trophies"]:
                 won_trophies.append(t["id"])
+                GamificationController.update_user_points(email,Points(points = t["points"]))
         return won_trophies
+
+    @staticmethod
+    def update_points_for_won_trophies(email, trophies):
+        for id in trophies:
+            trophy = TrophyRepository.get_trophy_by_id(id)
+            GamificationController.update_user_points(email,trophy["points"])
 
 
 

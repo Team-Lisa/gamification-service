@@ -7,7 +7,7 @@ from api.models.requests.user  import User
 
 router = APIRouter(tags=["Lives"])
 
-@router.get("/lives", response_model=LivesResponse)
+@router.get("/lives")
 async def get_user_lives(email: str = ""):
     return GamificationController.get_user_lives_by_email(email)
 
