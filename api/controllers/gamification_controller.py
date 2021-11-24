@@ -3,6 +3,7 @@ from api.Repositories.trophy_repository import TrophyRepository
 from api.controllers.constants import *
 from datetime import datetime
 from api.Repositories.user_status_repository import UserStatusRepository
+from api.helpers.gamification_helper import GamificationHelper
 from api.models.requests.points import Points
 from api.models.user_status import UserStatus
 from api.models.trophy import Trophy
@@ -55,21 +56,12 @@ class GamificationController:
     @staticmethod
     def update_user_lives(email, lives):
         actual_lives = GamificationController.get_user_lives_by_email(email)
-        total = actual_lives["lives"] + lives.lives
-        if total > 5:
-            new_lives = 5
-        elif total < 0:
-            new_lives = 0
-        else:
-            new_lives = total
-        if actual_lives["lives"] == 5 or lives.lives > 0:
+        new_lives = GamificationHelper.calculate_new_lives(actual_lives,lives)
+        if actual_lives["lives"] == LIVES or lives.lives > 0:
             result = UserStatusRepository.update_user_lives_and_last_life_actualization(email, new_lives)
             if lives.market:
-                UserStatusRepository.updateRule(COUNTBUYEDITEMS, email)
-                won_trophies = GamificationController.check_if_trophy_has_been_earned(email)
                 user_status = GamificationController.get_user_status_by_email(email)
-                user_status["user_status"]["trophies"] += won_trophies
-                UserStatusRepository.update_trophies(email, user_status["user_status"]["trophies"])
+                won_trophies = GamificationController.get_won_throphies(COUNTBUYEDITEMS,email,user_status)
             else:
                 won_trophies = []
         else:
@@ -113,10 +105,7 @@ class GamificationController:
         new_minutes = total if total >= 0 else 0
         UserStatusRepository.update_user_minutes(email, new_minutes)
         if minutes.extra_minutes > 0:
-            UserStatusRepository.updateRule(COUNTBUYEDITEMS, email)
-            won_trophies = GamificationController.check_if_trophy_has_been_earned(email)
-            user_status["user_status"]["trophies"] += won_trophies
-            UserStatusRepository.update_trophies(email, user_status["user_status"]["trophies"])
+            won_trophies = GamificationController.get_won_throphies(COUNTBUYEDITEMS,email,user_status)
         else:
             won_trophies = []
         return {
@@ -137,10 +126,7 @@ class GamificationController:
         new_amount = total if total >= 0 else 0
         UserStatusRepository.update_user_fastforwards(email, new_amount)
         if amount.fastforwards > 0:
-            UserStatusRepository.updateRule(COUNTBUYEDITEMS, email)
-            won_trophies = GamificationController.check_if_trophy_has_been_earned(email)
-            user_status["user_status"]["trophies"] += won_trophies
-            UserStatusRepository.update_trophies(email, user_status["user_status"]["trophies"])
+            won_trophies = GamificationController.get_won_throphies(COUNTBUYEDITEMS,email,user_status)
         else:
             won_trophies = []
         return {
@@ -170,17 +156,7 @@ class GamificationController:
     @staticmethod
     def update_unit_info(unit, challenge_id, unit_id, email):
         user_status = GamificationController.get_user_status_by_email(email)["user_status"]
-        history = user_status["history"]
-        if not challenge_id in history:
-            history[challenge_id] = {UNITS: {unit_id:
-                                                 {EXAMCOMPLETED: False,
-                                                  LESSONSCOMPLETED: [],
-                                                  UNITCOMPLETED: False}},
-                                     CHALLENGECOMPLETED: False}
-        elif challenge_id in history and not unit_id in history[challenge_id][UNITS]:
-            history[challenge_id][UNITS][unit_id] = {EXAMCOMPLETED: False,
-                                                     LESSONSCOMPLETED: [],
-                                                     UNITCOMPLETED: False}
+        history = GamificationHelper.get_user_status_history(challenge_id,unit_id,user_status)
         unit_data = history[challenge_id][UNITS][unit_id]
         if unit.lesonIdCompleted:
             unit_data[LESSONSCOMPLETED].append(unit.lesonIdCompleted)
@@ -206,14 +182,11 @@ class GamificationController:
 
     @staticmethod
     def update_challenge_completed(challenge_id, email):
-        user_status =  GamificationController.get_user_status_by_email(email)["user_status"]
-        history = user_status["history"]
+        user_status =  GamificationController.get_user_status_by_email(email)
+        history = user_status["user_status"]["history"]
         history[challenge_id][CHALLENGECOMPLETED] = True
-        UserStatusRepository.updateRule(COUNTCHALLENGES, email)
-        won_trophies = GamificationController.check_if_trophy_has_been_earned(email)
-        user_status["trophies"] += won_trophies
+        won_trophies = GamificationController.get_won_throphies(COUNTCHALLENGES,email,user_status)
         UserStatusRepository.update_history(email, history)
-        UserStatusRepository.update_trophies(email, user_status["trophies"])
         return {"won_trophies": won_trophies}
 
     @staticmethod
@@ -236,10 +209,13 @@ class GamificationController:
         return won_trophies
 
     @staticmethod
-    def update_points_for_won_trophies(email, trophies):
-        for id in trophies:
-            trophy = TrophyRepository.get_trophy_by_id(id)
-            GamificationController.update_user_points(email,trophy["points"])
+    def get_won_throphies(key_rule, email, user_status):
+        UserStatusRepository.updateRule(key_rule, email)
+        won_trophies = GamificationController.check_if_trophy_has_been_earned(email)
+        user_status["user_status"]["trophies"] += won_trophies
+        UserStatusRepository.update_trophies(email, user_status["user_status"]["trophies"])
+        return won_trophies
+
 
 
 
