@@ -8,5 +8,6 @@ def test_model_to_json():
     trophy = Trophy(description=description, points=points)
     assert trophy.convert_to_json() == {
         "description": description,
-        "points": points
+        "points": points,
+        "rules":{}
     }

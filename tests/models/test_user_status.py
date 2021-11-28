@@ -8,7 +8,7 @@ def test_model_to_json():
     actual_time = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
     user_status = UserStatus(email=email, lives=LIVES, last_life_actualization=actual_time,
                              trophies=TROPHIES, history=HISTORY, extra_minutes=EXTRA_MINUTES,
-                             fast_forward_exam=FAST_FORWARD_EXAM, points=POINTS)
+                             fast_forward_exam=FAST_FORWARD_EXAM, points=POINTS, rules=RULES)
     assert user_status.convert_to_json() == {
         "email": email,
         "lives": LIVES,
@@ -17,5 +17,6 @@ def test_model_to_json():
         "history": HISTORY,
         "extra_minutes": EXTRA_MINUTES,
         "fast_forward_exam": FAST_FORWARD_EXAM,
-        "points": POINTS
+        "points": POINTS,
+        "rules": RULES
     }
