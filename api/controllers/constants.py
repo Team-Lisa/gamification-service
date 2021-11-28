@@ -13,7 +13,7 @@ CHALLENGECOMPLETED = "challengeCompleted"
                             },
                 CHALLENGECOMPLETED:False}}
 """
-MAX_TIME = 5
+MAX_TIME = 300
 HISTORY = {}
 EXTRA_MINUTES = 0
 FAST_FORWARD_EXAM = 0
