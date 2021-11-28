@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from api.Repositories.trophy_repository import TrophyRepository
 from api.models.user_status import UserStatus
 
 
@@ -50,5 +52,13 @@ class UserStatusRepository():
     def update_trophies(email, trophies):
         UserStatus.objects(email=email).update(trophies=trophies)
         return {"message": "trophies updated"}
+
+    @staticmethod
+    def updateRule(key,email):
+        rules = UserStatusRepository.get_user_status_by_email(email=email)[0].convert_to_json()["rules"]
+        rules[key] += 1
+        UserStatus.objects(email=email).update(rules=rules)
+
+
 
 

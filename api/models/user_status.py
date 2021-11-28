@@ -11,6 +11,7 @@ class UserStatus(Document):
     extra_minutes = mongoengine.IntField()
     fast_forward_exam = mongoengine.IntField()
     points = mongoengine.IntField()
+    rules = mongoengine.DictField()
 
     def convert_to_json(self):
         result = self.to_mongo().to_dict()
