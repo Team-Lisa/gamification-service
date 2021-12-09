@@ -1,3 +1,5 @@
+import requests
+
 from api.Repositories.store_items_repository import StoreItemsRepository
 from api.Repositories.trophy_repository import TrophyRepository
 from api.controllers.constants import *
@@ -166,6 +168,8 @@ class GamificationController:
         if unit.unitCompleted:
             unit_data[UNITCOMPLETED] = unit.unitCompleted
             UserStatusRepository.updateRule(COUNTUNITS,email)
+            completed = GamificationController.check_if_challenge_is_completed(challenge_id,history[challenge_id][UNITS],email)
+            history[challenge_id][CHALLENGECOMPLETED] = completed
         if unit.allExercisesExam:
             UserStatusRepository.updateRule(ALLEXERCISESEXAM, email)
         if unit.allExercisesLesson:
@@ -215,6 +219,17 @@ class GamificationController:
         user_status["user_status"]["trophies"] += won_trophies
         UserStatusRepository.update_trophies(email, user_status["user_status"]["trophies"])
         return won_trophies
+
+    @staticmethod
+    def check_if_challenge_is_completed(challenge_id,units,email):
+        result = requests.get(EXERCICES_SERVICE + challenge_id)
+        if result.json()["challenge"]:
+            count_units_completed = GamificationHelper.count_units_completed(units)
+            if len(result.json()["challenge"]["units"]) == count_units_completed:
+                UserStatusRepository.updateRule(COUNTCHALLENGES, email)
+                return True
+        return False
+
 
 
 

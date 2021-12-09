@@ -29,3 +29,11 @@ class GamificationHelper:
                                                      UNITCOMPLETED: False}
         return history
 
+    @staticmethod
+    def count_units_completed(units):
+        count = 0
+        for value in units.values():
+            if value[UNITCOMPLETED]:
+                count += 1
+        return count
+

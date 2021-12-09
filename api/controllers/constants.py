@@ -34,4 +34,4 @@ RULES = {
     ALLEXERCISESLESSON: False,
     TIME: 0
 }
-
+EXERCICES_SERVICE = "http://exercises-service-idioma-play.herokuapp.com/challenges/"
